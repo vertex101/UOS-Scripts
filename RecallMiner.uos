@@ -1,0 +1,97 @@
+removelist 'Runes'
+removelist 'RuneBooks'
+@clearjournal
+
+//Select the weightless bag
+if not @findalias 'Bag of Holding'
+    promptalias 'Bag of Holding'
+endif
+
+//RuneBooks for marked mining spots
+if not @findobject 'Book1'
+    promptalias 'Book1'
+endif
+if not @findobject 'Book2'
+    promptalias 'Book2'
+endif
+
+//Home obj for when out of shovels
+if not @findobject 'Home'
+    promptalias 'Home'
+endif
+
+//adding the RuneBooks to a list 
+if not listexists 'RuneBooks'
+    createlist 'RuneBooks'
+endif
+
+//pushing the books the the list 
+if list 'RuneBooks' == 0
+    pushlist 'RuneBooks' 'Book1'
+    pushlist 'RuneBooks' 'Book2'
+endif
+
+//looking for the shvoel in backpack
+if @findtype '0x0F39' '0' 'backpack' 'any' '2'
+    //headmsg 'Ready to MINE!!!'
+else
+    cast 'Sacred Journey'
+    autotargetobject 'Home'
+    stop
+endif
+
+//setting up all the runes for the mining
+if not listexists 'Runes'
+    createlist 'Runes'
+endif
+
+if list 'Runes' == 0
+    pushlist 'Runes' 7
+    pushlist 'Runes' 13
+    pushlist 'Runes' 19
+    pushlist 'Runes' 25
+    pushlist 'Runes' 31
+    pushlist 'Runes' 37
+    pushlist 'Runes' 43
+    pushlist 'Runes' 49
+    pushlist 'Runes' 55
+    pushlist 'Runes' 61
+    pushlist 'Runes' 67
+    pushlist 'Runes' 73
+    pushlist 'Runes' 79
+    pushlist 'Runes' 85
+    pushlist 'Runes' 91
+    pushlist 'Runes' 97
+endif
+
+for 0 to RuneBooks
+    for 0 to 'Runes'
+        pause 500
+        @clearjournal
+        useobject RuneBooks[]
+        waitforgump 1431013363 5000
+        replygump 1431013363 Runes[]
+        pause 4000
+        while not @injournal 'There is no metal here to mine' 'system'
+            usetype '0x0F39' '0' 'backpack' 'any' '2'
+            targettileoffset 0 -1 0
+            pause 800
+            if injournal "You can't mine that." 'system'
+                @clearjournal
+                break
+            endif
+            if weight >= '481'
+                organizer 'move ores' 0x40607CB8 0x40607CBF 300
+                pause 2000
+                useobject 0x404A8A85
+                waitforgump 111922706 10000
+                replygump 111922706 39
+                pause 1000
+                waitforgump 111922706 10000
+                replygump 111922706 0
+            endif
+        endwhile
+    endfor
+    poplist 'Runes' 'front'
+endfor
+poplist 'RuneBooks' 'front'       
